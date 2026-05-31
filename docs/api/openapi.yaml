@@ -6,7 +6,7 @@ info:
     url: https://github.com/brokermr810/quantdinger
   license:
     name: See repository LICENSE
-  x-api-app-version: 3.0.20
+  x-api-app-version: 3.0.22
   title: QuantDinger Web API
   version: 1.0.0
 components:
@@ -132,7 +132,7 @@ components:
           example: QuantDinger Python API
         version:
           type: string
-          example: 3.0.20
+          example: 3.0.22
         status:
           type: string
           example: running
@@ -4761,9 +4761,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/HumanSuccessEnvelope'
       summary: Submit user feedback on an analysis.
-      description: "POST /api/fast-analysis/feedback\nBody: {\n    \"memory_id\":\
-        \ 123,\n    \"feedback\": \"helpful\" | \"not_helpful\" | \"accurate\" | \"\
-        inaccurate\"\n}"
+      description: 'Request body:
+
+        memory_id (required): Analysis history ID
+
+        feedback (required): helpful, not_helpful, accurate, or inaccurate'
       tags:
       - FastAnalysis
       operationId: postApiFastAnalysisFeedback
