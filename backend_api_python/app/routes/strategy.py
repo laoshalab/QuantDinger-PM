@@ -2218,7 +2218,14 @@ def ai_generate_strategy():
             system_prompt = """You tune quantitative strategy template parameters from the user's request.
 Return ONLY a single JSON object: keys are parameter names (strings), values are JSON numbers or booleans.
 You may return a partial object (only keys that should change) or a full object.
-Do not use markdown fences, do not add explanations before or after the JSON."""
+Do not use markdown fences, do not add explanations before or after the JSON.
+
+Percent parameter convention (IMPORTANT):
+- Template UI stores percent-type fields on a 0–100 scale (80 = 80%, 2.5 = 2.5%).
+- Generated Python code uses 0–1 ratios in ctx.param(...); the platform converts UI values automatically.
+- When returning JSON for adjust_params, always use the 0–100 scale for keys ending in _pct or typed as percent
+  (e.g. position_pct: 80, hard_stop_pct: 2.5). Never return 0.8 when the user means 80%.
+"""
 
             user_content = (
                 f"Template key: {template_key}\n"
@@ -2279,6 +2286,12 @@ Quality rules:
 - Use ctx.buy / ctx.sell / ctx.close_position for order intent
 - Generated code must compile cleanly
 - Avoid markdown fences or explanatory text
+
+Percent / ratio convention:
+- ctx.param defaults for *_pct fields must use 0–1 ratios (0.8 = 80%, 0.025 = 2.5%).
+- When sizing with ctx.equity * some_pct, keep some_pct as a 0–1 ratio.
+- Template UI may show 0–100; only the Python default literals should be ratios.
+- If user says "80% position", use ctx.param('position_pct', 0.8) and qty = ctx.equity * ctx.position_pct / price.
 """
 
         extra = ''
