@@ -945,9 +945,11 @@ class CommunityService:
                 vip_free = bool(indicator.get('vip_free') or False)
                 asset_type = str(indicator.get('asset_type') or 'indicator').strip().lower()
                 is_vip, _ = self.billing.get_user_vip_status(buyer_id)
+                billing_enabled = self.billing.is_billing_enabled()
 
-                # VIP-free indicator: VIP users can get it without credits charge
-                effective_price = 0.0 if (vip_free and is_vip) else price
+                # Global billing-off means marketplace delivery remains available
+                # but no buyer/seller credit movement is recorded.
+                effective_price = 0.0 if ((not billing_enabled) or (vip_free and is_vip)) else price
                 
                 # 2. 检查是否购买自己的指标
                 if seller_id == buyer_id:
@@ -1096,6 +1098,7 @@ class CommunityService:
                     'indicator_name': indicator['name'],
                     'price': price,
                     'charged': effective_price,
+                    'billing_enabled': billing_enabled,
                     'vip_free': vip_free,
                     'asset_type': asset_type,
                     'strategy_id': delivered_strategy_id,

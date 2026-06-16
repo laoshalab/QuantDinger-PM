@@ -34,7 +34,8 @@ backend_api_python/
 
 ## Architecture and quality guardrails
 
-- Backend architecture guide: `docs/backend_architecture.md`
+- Backend module boundaries: `../docs/MODULE_BOUNDARIES.md`
+- Concurrency model: `../docs/CONCURRENCY_MODEL.md`
 - Canonical live-trading venue matrix: `app/services/live_trading/capabilities.py`
 - Stable live order contracts: `app/services/live_trading/contracts.py`
 - Structural regression guard:

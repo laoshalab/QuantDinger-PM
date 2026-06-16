@@ -1634,6 +1634,7 @@ def _build_preflight(user_id: int) -> dict:
     api_key = llm.get_api_key(llm.provider)
     custom_base_ok = provider == "custom" and bool(llm.get_base_url(llm.provider))
     llm_ready = bool(api_key) or custom_base_ok or provider == "litellm"
+    billing_enabled = bool(billing.is_billing_enabled())
     credits = float(billing.get_user_credits(user_id))
     result = {
         "llm": {
@@ -1643,8 +1644,9 @@ def _build_preflight(user_id: int) -> dict:
             "action": {"path": "/settings", "query": {"section": "ai-llm"}},
         },
         "credits": {
-            "ready": credits > 0,
+            "ready": (not billing_enabled) or credits > 0,
             "balance": credits,
+            "billing_enabled": billing_enabled,
             "action": {"path": "/billing"},
         },
         "data_source": {
@@ -1675,7 +1677,7 @@ def _build_preflight(user_id: int) -> dict:
             "message": "Configure an LLM API key in System Settings before using AI Copilot.",
             "action": result["llm"]["action"],
         })
-    if not result["credits"]["ready"]:
+    if billing_enabled and not result["credits"]["ready"]:
         result["blockers"].append({
             "key": "credits_empty",
             "title": "Insufficient credits",

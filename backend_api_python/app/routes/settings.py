@@ -9,6 +9,7 @@ import importlib
 from flask import jsonify, request
 from app.openapi.blueprint import HumanBlueprint as Blueprint
 from app._version import APP_VERSION
+from app.markets.registry import market_options
 from app.utils.logger import get_logger
 from app.utils.config_loader import clear_config_cache
 from app.utils.auth import login_required, admin_required
@@ -87,13 +88,19 @@ def _refresh_runtime_services() -> None:
 ADVANCED_KEYS = {
     # AI tuning
     'OPENROUTER_TEMPERATURE',
-    'AI_ANALYSIS_CONSENSUS_TIMEFRAMES',
+    'AI_ANALYSIS_CONSENSUS_TIMEFRAMES', 'SEARCH_MAX_RESULTS',
+    'SEARCH_GOOGLE_API_KEY', 'SEARCH_GOOGLE_CX', 'SEARCH_BING_API_KEY', 'SERPAPI_KEYS',
     'AI_CODE_GEN_MODEL',
     'OPENAI_BASE_URL', 'DEEPSEEK_BASE_URL', 'GROK_BASE_URL', 'ATLASCLOUD_BASE_URL', 'MINIMAX_BASE_URL',
     # Trading internals
-    'MAKER_WAIT_SEC',
+    'ORDER_MODE', 'MAKER_WAIT_SEC',
+    'SPOT_CLOSE_SAFETY_RATIO', 'SPOT_OPEN_QUOTE_BUFFER',
+    'FINNHUB_API_KEY', 'FINNHUB_FREE_ONLY',
+    'TRADING_ECONOMICS_CLIENT', 'TRADING_ECONOMICS_KEY',
+    'COINGLASS_API_KEY', 'CRYPTOQUANT_API_KEY', 'TIINGO_API_KEY',
+    'TWELVE_DATA_API_KEY', 'ADANOS_API_KEY',
     # Agent gateway (operator-level)
-    'AGENT_JOBS_MAX_WORKERS', 'AGENT_LIVE_TRADING_ENABLED', 'QUANTDINGER_DEPLOYMENT_MODE',
+    'AGENT_JOBS_MAX_WORKERS',
     'ENABLE_PENDING_ORDER_WORKER', 'DISABLE_RESTORE_RUNNING_STRATEGIES',
     # OAuth advanced
     'OAUTH_ALLOWED_REDIRECTS', 'OAUTH_STATE_TTL_MINUTES',
@@ -121,7 +128,6 @@ ADVANCED_KEYS = {
     'BRAND_FAVICON_URL',
     'BRAND_LEGAL_USER_AGREEMENT_TEXT', 'BRAND_LEGAL_PRIVACY_POLICY_TEXT',
 }
-
 
 CONFIG_SCHEMA = {
 
@@ -642,7 +648,7 @@ CONFIG_SCHEMA = {
                 'label': 'Search Provider',
                 'type': 'select',
                 'options': ['tavily', 'google', 'bing', 'none'],
-                'default': 'google',
+                'default': 'tavily',
                 'description': 'News / web search provider used by AI analysis. Configure both LLM and search to get full AI analysis results'
             },
             {
@@ -743,21 +749,6 @@ CONFIG_SCHEMA = {
                 'description': 'Disable on a multi-tenant SaaS deployment so users see a clear "broker not supported" message instead of broken connect flows. Crypto exchange API keys are unaffected.'
             },
             {
-                'key': 'ENABLED_MARKETS',
-                'label': 'Enabled Markets (whitelist)',
-                'type': 'text',
-                'default': '',
-                'placeholder': 'Crypto,USStock,HKStock',
-                'description': 'CSV whitelist of markets exposed to the UI / Agent API / radar. When set, ONLY listed markets are visible everywhere; the legacy SHOW_CN_STOCK / SHOW_HK_STOCK flags are ignored. Valid values: Crypto, USStock, CNStock, HKStock, Forex, Futures, MOEX. Example: "Crypto,USStock". Empty = whitelist disabled (legacy flags apply).'
-            },
-            {
-                'key': 'SHOW_CN_STOCK',
-                'label': 'Show A-Share (CN Stock) in market picker',
-                'type': 'boolean',
-                'default': 'False',
-                'description': 'Legacy flag, ignored when ENABLED_MARKETS is set. Whether to expose the A-Share (CNStock) market type in frontend pickers. Strategy/data code stays intact either way.'
-            },
-            {
                 'key': 'ENABLE_PENDING_ORDER_WORKER',
                 'label': 'Enable Pending Order Worker',
                 'type': 'boolean',
@@ -780,6 +771,14 @@ CONFIG_SCHEMA = {
         'icon': 'database',
         'order': 4,
         'items': [
+            {
+                'key': 'ENABLED_MARKETS',
+                'label': 'Enabled Markets',
+                'type': 'market_multiselect',
+                'default': '',
+                'options': market_options(),
+                'description': 'Markets exposed to research, strategy, market data, Agent API, and live-trading entry points. Saved as ENABLED_MARKETS in .env for backward compatibility. Empty = whitelist disabled and legacy SHOW_* flags apply.'
+            },
             {
                 'key': 'CCXT_DEFAULT_EXCHANGE',
                 'label': 'Default Crypto Exchange',
