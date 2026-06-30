@@ -18,6 +18,7 @@ BILLING = "Billing"
 EXPERIMENT = "Experiment"
 FAST_ANALYSIS = "FastAnalysis"
 GLOBAL_MARKET = "GlobalMarket"
+POLYMARKET = "Polymarket"
 AI_CHAT = "AIChat"
 QUICK_TRADE = "QuickTrade"
 IBKR = "IBKR"
@@ -42,6 +43,7 @@ ALL_TAGS = [
     {"name": EXPERIMENT, "description": "Strategy tuning experiments (Internal)"},
     {"name": FAST_ANALYSIS, "description": "Fast AI analysis (Public)"},
     {"name": GLOBAL_MARKET, "description": "Global market overview (Public)"},
+    {"name": POLYMARKET, "description": "Polymarket prediction market analysis (Public)"},
     {"name": AI_CHAT, "description": "Legacy AI chat compatibility (Internal)"},
     {"name": QUICK_TRADE, "description": "Manual quick trade (Internal)"},
     {"name": IBKR, "description": "Interactive Brokers adapter (Internal)"},

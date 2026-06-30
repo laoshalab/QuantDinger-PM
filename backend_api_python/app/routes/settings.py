@@ -1648,6 +1648,13 @@ CONFIG_SCHEMA = {
                 'description': 'Credits per AI opportunity radar / market scan request'
             },
             {
+                'key': 'BILLING_COST_POLYMARKET_DEEP_ANALYSIS',
+                'label': 'Polymarket Deep Analysis Cost',
+                'type': 'number',
+                'default': '15',
+                'description': 'Credits per on-demand Polymarket prediction market AI analysis'
+            },
+            {
                 'key': 'CREDITS_REGISTER_BONUS',
                 'label': 'Register Bonus',
                 'type': 'number',

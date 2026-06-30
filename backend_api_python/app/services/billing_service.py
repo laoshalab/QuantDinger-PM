@@ -695,6 +695,7 @@ class BillingService:
                 'ai_copilot_chat': config.get('cost_ai_copilot_chat', 0),
                 'ai_copilot_image': config.get('cost_ai_copilot_image', 0),
                 'ai_copilot_radar': config.get('cost_ai_copilot_radar', 0),
+                'polymarket_deep_analysis': config.get('cost_polymarket_deep_analysis', 0),
             }
         }
 

@@ -85,6 +85,7 @@ class MarketDataCollector:
         timeframe: str = "1D",
         include_macro: bool = True,
         include_news: bool = True,
+        include_polymarket: bool = True,
         timeout: int = 30
     ) -> Dict[str, Any]:
         """
@@ -96,6 +97,7 @@ class MarketDataCollector:
             timeframe: K线周期
             include_macro: 是否包含宏观数据
             include_news: 是否包含新闻
+            include_polymarket: 是否包含预测市场数据
             timeout: 总超时时间(秒)
             
         Returns:
@@ -117,6 +119,7 @@ class MarketDataCollector:
             "macro": {},
             "news": [],
             "sentiment": {},
+            "polymarket": [],
             "_meta": {
                 "success_items": [],
                 "failed_items": [],
@@ -195,6 +198,16 @@ class MarketDataCollector:
             except Exception as e:
                 logger.warning(f"News fetch failed: {e}")
                 data["_meta"]["failed_items"].append("news")
+
+        if include_polymarket:
+            try:
+                polymarket_events = self._get_polymarket_events(symbol, market)
+                data["polymarket"] = polymarket_events
+                if polymarket_events:
+                    data["_meta"]["success_items"].append("polymarket")
+            except Exception as e:
+                logger.debug(f"Polymarket data fetch failed: {e}")
+                data["_meta"]["failed_items"].append("polymarket")
         
         data["_meta"]["duration_ms"] = int((time.time() - start_time) * 1000)
         logger.info(f"Market data collection completed for {market}:{symbol} in {data['_meta']['duration_ms']}ms")
@@ -1693,6 +1706,91 @@ class MarketDataCollector:
         except Exception as e:
             logger.debug(f"Failed to get global major events: {e}")
             return []
+
+    def _get_polymarket_events(self, symbol: str, market: str) -> List[Dict]:
+        """Fetch Polymarket events related to a tradable symbol."""
+        try:
+            from app.data_sources.polymarket import PolymarketDataSource
+
+            polymarket_source = PolymarketDataSource()
+            keywords = self._extract_polymarket_keywords(symbol, market)
+            logger.info(f"Extracted Polymarket keywords for {symbol}: {keywords}")
+
+            related_markets = []
+            for keyword in keywords[:2]:
+                try:
+                    markets = polymarket_source.search_markets(keyword, limit=5, use_cache=True)
+                    related_markets.extend(markets)
+                except Exception as e:
+                    logger.warning(f"Failed to search Polymarket for keyword '{keyword}': {e}")
+
+            seen = set()
+            result = []
+            for market_data in related_markets:
+                market_id = market_data.get("market_id")
+                if not market_id or market_id in seen:
+                    continue
+                seen.add(market_id)
+                polymarket_url = market_data.get("polymarket_url")
+                if not polymarket_url:
+                    slug = market_data.get("slug")
+                    if slug and not str(slug).isdigit():
+                        polymarket_url = f"https://polymarket.com/event/{slug}"
+                    else:
+                        polymarket_url = f"https://polymarket.com/markets/{market_id}"
+                result.append(
+                    {
+                        "market_id": market_id,
+                        "question": market_data.get("question", ""),
+                        "current_probability": market_data.get("current_probability", 50.0),
+                        "volume_24h": market_data.get("volume_24h", 0),
+                        "liquidity": market_data.get("liquidity", 0),
+                        "category": market_data.get("category", "other"),
+                        "polymarket_url": polymarket_url,
+                    }
+                )
+
+            logger.info(f"Total {len(result)} unique Polymarket events found for {symbol}")
+            return result
+        except Exception as e:
+            logger.debug(f"Failed to get polymarket events for {symbol}: {e}")
+            return []
+
+    def _extract_polymarket_keywords(self, symbol: str, market: str) -> List[str]:
+        """Extract search keywords for Polymarket event lookup."""
+        keywords = []
+        if "/" in symbol:
+            keywords.append(symbol.split("/")[0])
+        else:
+            keywords.append(symbol)
+
+        crypto_names = {
+            "BTC": "Bitcoin",
+            "ETH": "Ethereum",
+            "SOL": "Solana",
+            "BNB": "Binance",
+            "XRP": "Ripple",
+            "ADA": "Cardano",
+            "DOGE": "Dogecoin",
+            "AVAX": "Avalanche",
+            "DOT": "Polkadot",
+            "POL": "Polygon",
+        }
+        base_symbol = symbol.split("/")[0] if "/" in symbol else symbol
+        if base_symbol in crypto_names:
+            keywords.append(crypto_names[base_symbol])
+
+        unique_keywords = []
+        seen = set()
+        for kw in keywords:
+            kw_lower = kw.lower()
+            if kw_lower not in seen:
+                seen.add(kw_lower)
+                unique_keywords.append(kw)
+                if len(unique_keywords) >= 3:
+                    break
+        return unique_keywords
+
     
 _collector: Optional[MarketDataCollector] = None
 

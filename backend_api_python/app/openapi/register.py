@@ -31,6 +31,7 @@ _PREFIX_TAGS: list[tuple[str, str]] = [
     ("/api/ibkr", "IBKR"),
     ("/api/alpaca", "Alpaca"),
     ("/api/global-market", "GlobalMarket"),
+    ("/api/polymarket", "Polymarket"),
     ("/api/community", "Community"),
     ("/api/fast-analysis", "FastAnalysis"),
     ("/api/billing", "Billing"),
@@ -70,6 +71,7 @@ def register_human_blueprints(api: Api) -> None:
     from app.routes.ibkr import ibkr_blp
     from app.routes.alpaca import alpaca_blp
     from app.routes.global_market import global_market_blp
+    from app.routes.polymarket import polymarket_blp
     from app.routes.community import community_blp
     from app.routes.fast_analysis import fast_analysis_blp
     from app.routes.billing import billing_blp
@@ -95,6 +97,7 @@ def register_human_blueprints(api: Api) -> None:
         (ibkr_blp, "/api/ibkr"),
         (alpaca_blp, "/api/alpaca"),
         (global_market_blp, "/api/global-market"),
+        (polymarket_blp, "/api/polymarket"),
         (community_blp, "/api/community"),
         (fast_analysis_blp, "/api/fast-analysis"),
         (billing_blp, "/api/billing"),
@@ -232,7 +235,7 @@ def enrich_spec(spec_dict: dict) -> dict:
                         },
                     }
             if "x-visibility" not in op:
-                if tag in ("Community", "Market", "Indicator", "Backtest", "Policy", "Auth", "GlobalMarket", "FastAnalysis", "Health"):
+                if tag in ("Community", "Market", "Indicator", "Backtest", "Policy", "Auth", "GlobalMarket", "FastAnalysis", "Polymarket", "Health"):
                     op["x-visibility"] = "public"
                 elif tag in ("Credentials", "QuickTrade", "Billing"):
                     op["x-visibility"] = "private"

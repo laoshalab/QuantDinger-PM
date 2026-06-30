@@ -193,6 +193,8 @@ tags:
   description: Fast AI analysis (Public)
 - name: GlobalMarket
   description: Global market overview (Public)
+- name: Polymarket
+  description: Polymarket prediction market analysis (Public)
 - name: AIChat
   description: Legacy AI chat compatibility (Internal)
 - name: QuickTrade
@@ -4726,6 +4728,50 @@ paths:
       tags:
       - GlobalMarket
       operationId: postApiGlobalMarketRefresh
+      x-visibility: public
+  /api/polymarket/analyze:
+    post:
+      responses:
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HumanErrorEnvelope'
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HumanSuccessEnvelope'
+      summary: Analyze a Polymarket prediction market from a URL or title.
+      description: 'POST /api/polymarket/analyze
+
+        Body: { "input": "<url or title>", "language": "zh-CN", "model": "<optional>"
+        }'
+      tags:
+      - Polymarket
+      operationId: postApiPolymarketAnalyze
+      x-visibility: public
+  /api/polymarket/history:
+    get:
+      responses:
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HumanErrorEnvelope'
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HumanSuccessEnvelope'
+      summary: GET /api/polymarket/history?page=1&page_size=20
+      tags:
+      - Polymarket
+      operationId: getApiPolymarketHistory
       x-visibility: public
   /api/community/indicators:
     get:
