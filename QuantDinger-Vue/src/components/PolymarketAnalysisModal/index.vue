@@ -9,6 +9,13 @@
     :maskClosable="false"
   >
     <div class="polymarket-analysis-modal" :class="{ 'theme-dark': isDarkTheme }">
+      <a-alert
+        :message="$t('polymarket.analysis.disclaimer')"
+        type="warning"
+        show-icon
+        banner
+        style="margin-bottom: 12px;"
+      />
       <a-tabs default-active-key="analyze" @change="handleTabChange">
         <a-tab-pane key="analyze" :tab="$t('polymarket.analysis.tabAnalyze')">
           <!-- 输入区域 -->

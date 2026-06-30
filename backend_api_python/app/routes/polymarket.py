@@ -138,7 +138,6 @@ def analyze_polymarket():
 
         billing = get_billing_service()
         cost = 0
-
         if billing.is_billing_enabled():
             cost = billing.get_feature_cost("polymarket_deep_analysis")
             if cost > 0:
@@ -156,30 +155,6 @@ def analyze_polymarket():
                         }
                     ), 400
 
-                success, error_msg = billing.check_and_consume(
-                    user_id=user_id,
-                    feature="polymarket_deep_analysis",
-                    reference_id=f"polymarket_{market_id}",
-                )
-                if not success:
-                    if error_msg.startswith("insufficient_credits"):
-                        parts = error_msg.split(":")
-                        if len(parts) >= 3:
-                            return jsonify(
-                                {
-                                    "code": 0,
-                                    "msg": "Insufficient credits",
-                                    "data": {
-                                        "required": float(parts[2]),
-                                        "current": float(parts[1]),
-                                        "shortage": float(Decimal(parts[2]) - Decimal(parts[1])),
-                                    },
-                                }
-                            ), 400
-                    return jsonify(
-                        {"code": 0, "msg": f"Failed to deduct credits: {error_msg}", "data": None}
-                    ), 500
-
         analyzer = PolymarketAnalyzer()
         analysis_result = analyzer.analyze_market(
             market_id,
@@ -192,10 +167,48 @@ def analyze_polymarket():
 
         if analysis_result.get("error"):
             return jsonify(
-                {"code": 0, "msg": analysis_result.get("error", "Analysis failed"), "data": None}
+                {
+                    "code": 0,
+                    "msg": analysis_result.get("error") or "Analysis failed",
+                    "data": None,
+                }
             ), 500
 
-        remaining_credits = float(billing.get_user_credits(user_id)) if billing.is_billing_enabled() else 0
+        credits_charged = 0
+        if billing.is_billing_enabled() and cost > 0:
+            success, error_msg = billing.check_and_consume(
+                user_id=user_id,
+                feature="polymarket_deep_analysis",
+                reference_id=f"polymarket_{market_id}",
+            )
+            if not success:
+                if error_msg.startswith("insufficient_credits"):
+                    parts = error_msg.split(":")
+                    if len(parts) >= 3:
+                        return jsonify(
+                            {
+                                "code": 0,
+                                "msg": "Insufficient credits",
+                                "data": {
+                                    "required": float(parts[2]),
+                                    "current": float(parts[1]),
+                                    "shortage": float(Decimal(parts[2]) - Decimal(parts[1])),
+                                },
+                            }
+                        ), 400
+                logger.error(
+                    "Polymarket analysis succeeded but billing failed for user %s: %s",
+                    user_id,
+                    error_msg,
+                )
+                return jsonify(
+                    {"code": 0, "msg": "Failed to deduct credits", "data": None}
+                ), 500
+            credits_charged = cost
+
+        remaining_credits = (
+            float(billing.get_user_credits(user_id)) if billing.is_billing_enabled() else 0
+        )
 
         return jsonify(
             {
@@ -204,7 +217,7 @@ def analyze_polymarket():
                 "data": {
                     "market": market,
                     "analysis": analysis_result,
-                    "credits_charged": cost,
+                    "credits_charged": credits_charged,
                     "remaining_credits": remaining_credits,
                 },
             }
@@ -212,7 +225,7 @@ def analyze_polymarket():
 
     except Exception as e:
         logger.error("Polymarket analyze API failed: %s", e, exc_info=True)
-        return jsonify({"code": 0, "msg": str(e), "data": None}), 500
+        return jsonify({"code": 0, "msg": "Analysis failed", "data": None}), 500
 
 
 @polymarket_blp.route("/history", methods=["GET"])
@@ -307,4 +320,4 @@ def get_polymarket_history():
 
     except Exception as e:
         logger.error("Get Polymarket history failed: %s", e, exc_info=True)
-        return jsonify({"code": 0, "msg": str(e), "data": None}), 500
+        return jsonify({"code": 0, "msg": "Failed to load history", "data": None}), 500

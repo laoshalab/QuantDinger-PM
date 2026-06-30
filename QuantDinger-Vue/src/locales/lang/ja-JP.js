@@ -739,6 +739,7 @@ const locale = {
   'polymarket.error.invalidMarketId': '無効な市場IDです',
   'polymarket.analysis.title': 'Polymarket予測市場分析',
   'polymarket.analysis.description': 'Polymarketリンクまたは市場タイトルを入力すると、AIが予測市場の取引機会を分析します',
+  'polymarket.analysis.disclaimer': 'AI分析は調査目的のみであり、投資助言ではありません。予測市場にはリスクがあります。',
   'polymarket.analysis.startAnalysis': '分析開始',
   'polymarket.analysis.inputHint': 'Polymarket市場リンクまたは市場タイトルを入力してください',
   'polymarket.analysis.inputPlaceholder': '例：https://polymarket.com/event/xxx または "Bitcoin price above $100k in 2025?"',

@@ -739,6 +739,7 @@ const locale = {
   'polymarket.error.invalidMarketId': 'معرف سوق غير صالح',
   'polymarket.analysis.title': 'تحليل سوق التنبؤ Polymarket',
   'polymarket.analysis.description': 'أدخل رابط Polymarket أو عنوان السوق، وسيقوم AI بتحليل فرص التداول في سوق التنبؤ لك',
+  'polymarket.analysis.disclaimer': 'تحليل الذكاء الاصطناعي للبحث فقط وليس نصيحة استثمارية. أسواق التوقعات تنطوي على مخاطر.',
   'polymarket.analysis.startAnalysis': 'بدء التحليل',
   'polymarket.analysis.inputHint': 'الرجاء إدخال رابط سوق Polymarket أو عنوان السوق',
   'polymarket.analysis.inputPlaceholder': 'مثال: https://polymarket.com/event/xxx أو "Bitcoin price above $100k in 2025?"',

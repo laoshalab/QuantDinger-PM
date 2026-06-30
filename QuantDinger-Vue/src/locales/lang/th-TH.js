@@ -739,6 +739,7 @@ const locale = {
   'polymarket.error.invalidMarketId': 'ID ตลาดไม่ถูกต้อง',
   'polymarket.analysis.title': 'การวิเคราะห์ตลาดทำนาย Polymarket',
   'polymarket.analysis.description': 'ป้อนลิงก์ Polymarket หรือชื่อตลาด AI จะวิเคราะห์โอกาสการซื้อขายในตลาดทำนายให้คุณ',
+  'polymarket.analysis.disclaimer': 'การวิเคราะห์ AI ใช้เพื่อการวิจัยเท่านั้น ไม่ใช่คำแนะนำการลงทุน ตลาดทำนายมีความเสี่ยง',
   'polymarket.analysis.startAnalysis': 'เริ่มวิเคราะห์',
   'polymarket.analysis.inputHint': 'โปรดป้อนลิงก์ตลาด Polymarket หรือชื่อตลาด',
   'polymarket.analysis.inputPlaceholder': 'เช่น: https://polymarket.com/event/xxx หรือ "Bitcoin price above $100k in 2025?"',

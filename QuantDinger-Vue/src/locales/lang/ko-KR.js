@@ -739,6 +739,7 @@ const locale = {
   'polymarket.error.invalidMarketId': '유효하지 않은 시장 ID',
   'polymarket.analysis.title': 'Polymarket 예측 시장 분석',
   'polymarket.analysis.description': 'Polymarket 링크 또는 시장 제목을 입력하면 AI가 예측 시장의 거래 기회를 분석합니다',
+  'polymarket.analysis.disclaimer': 'AI 분석은 연구 목적일 뿐이며 투자 조언이 아닙니다. 예측 시장에는 위험이 따릅니다.',
   'polymarket.analysis.startAnalysis': '분석 시작',
   'polymarket.analysis.inputHint': 'Polymarket 시장 링크 또는 시장 제목을 입력해 주세요',
   'polymarket.analysis.inputPlaceholder': '예: https://polymarket.com/event/xxx 또는 "Bitcoin price above $100k in 2025?"',

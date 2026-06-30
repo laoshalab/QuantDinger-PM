@@ -729,6 +729,7 @@ const locale = {
   'polymarket.error.invalidMarketId': '无效的市场ID',
   'polymarket.analysis.title': 'Polymarket预测市场分析',
   'polymarket.analysis.description': '输入Polymarket链接或市场标题，AI将为您分析预测市场的交易机会',
+  'polymarket.analysis.disclaimer': 'AI 分析仅供研究参考，不构成投资建议。预测市场存在风险，请谨慎决策。',
   'polymarket.analysis.startAnalysis': '开始分析',
   'polymarket.analysis.inputHint': '请输入Polymarket市场链接或市场标题',
   'polymarket.analysis.inputPlaceholder': '例如：https://polymarket.com/event/xxx 或 "Bitcoin price above $100k in 2025?"',

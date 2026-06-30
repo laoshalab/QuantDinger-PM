@@ -1,6 +1,7 @@
 """HTTP tests for /api/polymarket/* (mocked data source + analyzer)."""
 from __future__ import annotations
 
+from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -68,6 +69,68 @@ def test_analyze_polymarket_success(mock_source, mock_billing, mock_analyzer_cls
     call_kw = mock_analyzer_cls.return_value.analyze_market.call_args.kwargs
     assert call_kw["use_cache"] is False
     assert call_kw["market_data"] == SAMPLE_MARKET
+    billing.check_and_consume.assert_not_called()
+
+
+@patch("app.services.polymarket_analyzer.PolymarketAnalyzer")
+@patch("app.routes.polymarket.get_billing_service")
+@patch("app.routes.polymarket.polymarket_source")
+def test_analyze_polymarket_charges_only_after_success(
+    mock_source, mock_billing, mock_analyzer_cls, client, auth_headers
+):
+    mock_source.get_market_details.return_value = SAMPLE_MARKET
+    mock_analyzer_cls.return_value.analyze_market.return_value = SAMPLE_ANALYSIS
+
+    billing = MagicMock()
+    billing.is_billing_enabled.return_value = True
+    billing.get_feature_cost.return_value = 15
+    billing.get_user_credits.return_value = Decimal("100")
+    billing.check_and_consume.return_value = (True, "consumed")
+    mock_billing.return_value = billing
+
+    resp = client.post(
+        "/api/polymarket/analyze",
+        json={"input": "https://polymarket.com/event/btc-100k-2026", "language": "en-US"},
+        headers=auth_headers,
+    )
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["code"] == 1
+    assert body["data"]["credits_charged"] == 15
+    billing.check_and_consume.assert_called_once_with(
+        user_id=42,
+        feature="polymarket_deep_analysis",
+        reference_id="polymarket_12345",
+    )
+
+
+@patch("app.services.polymarket_analyzer.PolymarketAnalyzer")
+@patch("app.routes.polymarket.get_billing_service")
+@patch("app.routes.polymarket.polymarket_source")
+def test_analyze_polymarket_failure_does_not_consume_credits(
+    mock_source, mock_billing, mock_analyzer_cls, client, auth_headers
+):
+    mock_source.get_market_details.return_value = SAMPLE_MARKET
+    mock_analyzer_cls.return_value.analyze_market.return_value = {
+        "error": "LLM timeout",
+        "market_id": "12345",
+    }
+
+    billing = MagicMock()
+    billing.is_billing_enabled.return_value = True
+    billing.get_feature_cost.return_value = 15
+    billing.get_user_credits.return_value = Decimal("100")
+    mock_billing.return_value = billing
+
+    resp = client.post(
+        "/api/polymarket/analyze",
+        json={"input": "https://polymarket.com/event/btc-100k-2026", "language": "en-US"},
+        headers=auth_headers,
+    )
+    assert resp.status_code == 500
+    body = resp.get_json()
+    assert body["code"] == 0
+    billing.check_and_consume.assert_not_called()
 
 
 @patch("app.routes.polymarket.polymarket_source")

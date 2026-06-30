@@ -739,6 +739,7 @@ const locale = {
   'polymarket.error.invalidMarketId': 'ID de marché invalide',
   'polymarket.analysis.title': 'Analyse des marchés de prédiction Polymarket',
   'polymarket.analysis.description': 'Entrez un lien Polymarket ou un titre de marché, et l\'AI analysera les opportunités de trading pour vous',
+  'polymarket.analysis.disclaimer': 'L'analyse IA est à titre de recherche uniquement et ne constitue pas un conseil en investissement.',
   'polymarket.analysis.startAnalysis': 'Commencer l\'analyse',
   'polymarket.analysis.inputHint': 'Veuillez entrer un lien de marché Polymarket ou un titre de marché',
   'polymarket.analysis.inputPlaceholder': 'Par exemple : https://polymarket.com/event/xxx ou "Bitcoin price above $100k in 2025?"',

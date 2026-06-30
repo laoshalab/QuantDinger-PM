@@ -739,6 +739,7 @@ const locale = {
   'polymarket.error.invalidMarketId': 'ID thị trường không hợp lệ',
   'polymarket.analysis.title': 'Phân tích thị trường dự đoán Polymarket',
   'polymarket.analysis.description': 'Nhập liên kết Polymarket hoặc tiêu đề thị trường, AI sẽ phân tích cơ hội giao dịch cho bạn',
+  'polymarket.analysis.disclaimer': 'Phân tích AI chỉ phục vụ nghiên cứu, không phải lời khuyên đầu tư. Thị trường dự đoán có rủi ro.',
   'polymarket.analysis.startAnalysis': 'Bắt đầu phân tích',
   'polymarket.analysis.inputHint': 'Vui lòng nhập liên kết thị trường Polymarket hoặc tiêu đề thị trường',
   'polymarket.analysis.inputPlaceholder': 'Ví dụ: https://polymarket.com/event/xxx hoặc "Bitcoin price above $100k in 2025?"',
